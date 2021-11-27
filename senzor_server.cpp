@@ -16,12 +16,12 @@ namespace util {
     auto& userAccelerStruct = map.at("userAccelerStruct").AsMap();
 
     return {
-        .accelerometer = {
+        .acceleration = {
             static_cast<float>(accelerStruct.at("x").AsDouble()),
             static_cast<float>(accelerStruct.at("y").AsDouble()),
             static_cast<float>(accelerStruct.at("z").AsDouble())
     },
-        .user_accelerometer = {
+        .user_acceleration = {
             static_cast<float>(userAccelerStruct.at("ux").AsDouble()),
             static_cast<float>(userAccelerStruct.at("uy").AsDouble()),
             static_cast<float>(userAccelerStruct.at("uz").AsDouble())

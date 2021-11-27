@@ -10,8 +10,8 @@ namespace rempos {
 namespace senzor_server {
 
 struct SenzorResult {
-    Vector accelerometer;
-    Vector user_accelerometer;
+    Vector acceleration;
+    Vector user_acceleration;
     QAngle gyroscope;
     struct Coordinates {
         double lat = 0.0, lng = 0.0;

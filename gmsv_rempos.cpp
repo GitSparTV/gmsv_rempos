@@ -11,8 +11,8 @@ namespace gmsv {
     void PushSenzorResult(GarrysMod::Lua::ILuaBase* LUA, senzor_server::SenzorResult& senzor) {
         LUA->CreateTable();
 
-        LUA->PushVector(senzor.accelerometer);
-        LUA->SetField(-2, "accelerometer");
+        LUA->PushVector(senzor.acceleration);
+        LUA->SetField(-2, "acceleration");
 
         LUA->PushNumber(senzor.gps.lat);
         LUA->SetField(-2, "gps_lat");
@@ -29,8 +29,8 @@ namespace gmsv {
         LUA->PushNumber(senzor.timecode);
         LUA->SetField(-2, "timecode");
 
-        LUA->PushVector(senzor.user_accelerometer);
-        LUA->SetField(-2, "user_accelerometer");
+        LUA->PushVector(senzor.user_acceleration);
+        LUA->SetField(-2, "user_acceleration");
 
     }
 
@@ -77,12 +77,12 @@ namespace gmsv {
     }
 
     // Single getters
-    LUA_FUNCTION(GetAccelerometer) {
+    LUA_FUNCTION(GetAcceleration) {
         assert(kRemPos);
 
         senzor_server::SenzorResult data = kRemPos->GetData();
 
-        LUA->PushVector(data.accelerometer);
+        LUA->PushVector(data.acceleration);
 
         return 1;
     }
@@ -95,7 +95,7 @@ namespace gmsv {
         LUA->PushNumber(data.gps.lat);
         LUA->PushNumber(data.gps.lng);
 
-        return 1;
+        return 2;
     }
 
     LUA_FUNCTION(GetGyroscope) {
@@ -128,12 +128,12 @@ namespace gmsv {
         return 1;
     }
 
-    LUA_FUNCTION(GetUserAccelerometer) {
+    LUA_FUNCTION(GetUserAcceleration) {
         assert(kRemPos);
 
         senzor_server::SenzorResult data = kRemPos->GetData();
 
-        LUA->PushVector(data.user_accelerometer);
+        LUA->PushVector(data.user_acceleration);
 
         return 1;
     }
@@ -146,12 +146,12 @@ namespace gmsv {
 _G.RemPos = {
     Initialize: function,
     GetData: function,
-    GetAccelerometer: function,
+    GetAcceleration: function,
     GetGPS: function,
     GetGyroscope: function,
     GetPressure: function,
     GetTimecode: function,
-    GetUserAccelerometer: function
+    GetUserAcceleration: function
 }
 */
 GMOD_MODULE_OPEN() {
@@ -165,8 +165,8 @@ GMOD_MODULE_OPEN() {
     LUA->PushCFunction(rempos::gmsv::GetData);
     LUA->SetField(-2, "GetData");
 
-    LUA->PushCFunction(rempos::gmsv::GetAccelerometer);
-    LUA->SetField(-2, "GetAccelerometer");
+    LUA->PushCFunction(rempos::gmsv::GetAcceleration);
+    LUA->SetField(-2, "GetAcceleration");
 
     LUA->PushCFunction(rempos::gmsv::GetGPS);
     LUA->SetField(-2, "GetGPS");
@@ -180,8 +180,8 @@ GMOD_MODULE_OPEN() {
     LUA->PushCFunction(rempos::gmsv::GetTimecode);
     LUA->SetField(-2, "GetTimecode");
 
-    LUA->PushCFunction(rempos::gmsv::GetUserAccelerometer);
-    LUA->SetField(-2, "GetUserAccelerometer");
+    LUA->PushCFunction(rempos::gmsv::GetUserAcceleration);
+    LUA->SetField(-2, "GetUserAcceleration");
 
     LUA->SetField(-2, "RemPos");
 
