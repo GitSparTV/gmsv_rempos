@@ -5,6 +5,8 @@ Built with [websocketpp](https://github.com/zaphoyd/websocketpp) library.
 
 ## Demo
 
+https://user-images.githubusercontent.com/5685050/143723137-593afe00-7c64-4690-87ab-0fe94f25c7de.mp4
+
 ---
 
 __[<img src="https://raw.githubusercontent.com/GitSparTV/GitSparTV/main/saythanks.svg" width="300">](https://gitspartv.github.io/GitSparTV/saythanks.html)__
@@ -22,11 +24,13 @@ Requirements: CMake, C++20, Websocketpp headers, Standalone ASIO or Boost.ASIO, 
 ```sh
 mkdir build
 cd build
-cmake ../ -DGMOD_MODULE_BASE="<path_to_gmod_module_base_root" -DWEBSOCKETPP="path_to_websockepp_root" -DASIO="path_to_asio" -A Win32
+cmake ../ -DGMOD_MODULE_BASE="<path_to_gmod_module_base_root>" -DWEBSOCKETPP="<path_to_websockepp_root>" -DASIO="<path_to_asio>" -A Win32
 cmake --build . --config=Release --verbose
 ```
 
 To build with Boost.ASIO add `-DASIO_STANDALONE=OFF`.
+
+`-A Win32` is requires only for x86 (x32) builds.
 
 ## Documentation
 
