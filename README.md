@@ -32,6 +32,15 @@ To build with Boost.ASIO add `-DASIO_STANDALONE=OFF`.
 
 `-A Win32` is requires only for x86 (x32) builds.
 
+Quick note: gmod-module-base requires small patch in the SourceCompat.h:
+```c++
+        Vector(float x, float y, float z)
+            : x(x)
+            , y(y)
+            , z(z)
+        {}
+```
+
 ## Documentation
 
 First of all call `require("rempos")`, this will popular `RemPos` global table.
