@@ -28,9 +28,19 @@ public:
 public:
     Server(CallbackType callback);
 
+    Server(Server&) = delete;
+
+    Server(Server&&) = delete;
+
     ~Server() {
         Stop();
     }
+
+public:
+
+    Server& operator=(Server&) = delete;
+
+    Server& operator=(Server&&) = delete;
 
 public:
     inline void Run(std::string ip, std::string port) {

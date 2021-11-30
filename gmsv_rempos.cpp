@@ -5,8 +5,8 @@
 namespace rempos {
 
 namespace gmsv {
-    constexpr uint16_t kDefaultPort = 8080;
-    RemPos* kRemPos = nullptr;
+    static constexpr uint16_t kDefaultPort = 8080;
+    static std::unique_ptr<RemPos> rempos_server = nullptr;
 
     void PushSenzorResult(GarrysMod::Lua::ILuaBase* LUA, senzor_server::SenzorResult& senzor) {
         LUA->CreateTable();
@@ -38,8 +38,10 @@ namespace gmsv {
     // 1 argument: ip = localhost, port = argument_1:number
     // 2 arguments: ip = argument_1:string, port = argument_2:string
     LUA_FUNCTION(Initialize) {
-        if (kRemPos) {
-            return 0;
+        if (rempos_server) {
+            LUA->PushBool(true);
+
+            return 1;
         }
 
         int top = LUA->Top();
@@ -51,12 +53,12 @@ namespace gmsv {
                 port = static_cast<uint16_t>(LUA->GetNumber(1));
             }
 
-            kRemPos = new(std::nothrow) RemPos(port);
+            rempos_server.reset(new(std::nothrow) RemPos(port));
         } else if (top >= 2) {
-            kRemPos = new(std::nothrow) RemPos(LUA->CheckString(1), LUA->CheckString(2));
+            rempos_server.reset(new(std::nothrow) RemPos(LUA->CheckString(1), LUA->CheckString(2)));
         }
 
-        if (!kRemPos) {
+        if (!rempos_server) {
             LUA->ThrowError("Couldn't create RemPos object. Maybe not enough memory.");
         }
 
@@ -67,9 +69,11 @@ namespace gmsv {
 
     // Get all sensors at once
     LUA_FUNCTION(GetData) {
-        assert(kRemPos);
+        if (!rempos_server) {
+            LUA->ThrowError("RemPos is not initialized");
+        }
 
-        senzor_server::SenzorResult data = kRemPos->GetData();
+        senzor_server::SenzorResult data = rempos_server->GetData();
 
         PushSenzorResult(LUA, data);
 
@@ -78,9 +82,11 @@ namespace gmsv {
 
     // Single getters
     LUA_FUNCTION(GetAcceleration) {
-        assert(kRemPos);
+        if (!rempos_server) {
+            LUA->ThrowError("RemPos is not initialized");
+        }
 
-        senzor_server::SenzorResult data = kRemPos->GetData();
+        senzor_server::SenzorResult data = rempos_server->GetData();
 
         LUA->PushVector(data.acceleration);
 
@@ -88,9 +94,11 @@ namespace gmsv {
     }
 
     LUA_FUNCTION(GetGPS) {
-        assert(kRemPos);
+        if (!rempos_server) {
+            LUA->ThrowError("RemPos is not initialized");
+        }
 
-        senzor_server::SenzorResult data = kRemPos->GetData();
+        senzor_server::SenzorResult data = rempos_server->GetData();
 
         LUA->PushNumber(data.gps.lat);
         LUA->PushNumber(data.gps.lng);
@@ -99,9 +107,11 @@ namespace gmsv {
     }
 
     LUA_FUNCTION(GetGyroscope) {
-        assert(kRemPos);
+        if (!rempos_server) {
+            LUA->ThrowError("RemPos is not initialized");
+        }
 
-        senzor_server::SenzorResult data = kRemPos->GetData();
+        senzor_server::SenzorResult data = rempos_server->GetData();
 
         LUA->PushAngle(data.gyroscope);
 
@@ -109,9 +119,11 @@ namespace gmsv {
     }
 
     LUA_FUNCTION(GetPressure) {
-        assert(kRemPos);
+        if (!rempos_server) {
+            LUA->ThrowError("RemPos is not initialized");
+        }
 
-        senzor_server::SenzorResult data = kRemPos->GetData();
+        senzor_server::SenzorResult data = rempos_server->GetData();
 
         LUA->PushNumber(data.pressure);
 
@@ -119,9 +131,11 @@ namespace gmsv {
     }
 
     LUA_FUNCTION(GetTimecode) {
-        assert(kRemPos);
+        if (!rempos_server) {
+            LUA->ThrowError("RemPos is not initialized");
+        }
 
-        senzor_server::SenzorResult data = kRemPos->GetData();
+        senzor_server::SenzorResult data = rempos_server->GetData();
 
         LUA->PushNumber(data.timecode);
 
@@ -129,9 +143,11 @@ namespace gmsv {
     }
 
     LUA_FUNCTION(GetUserAcceleration) {
-        assert(kRemPos);
+        if (!rempos_server) {
+            LUA->ThrowError("RemPos is not initialized");
+        }
 
-        senzor_server::SenzorResult data = kRemPos->GetData();
+        senzor_server::SenzorResult data = rempos_server->GetData();
 
         LUA->PushVector(data.user_acceleration);
 
@@ -191,8 +207,7 @@ GMOD_MODULE_OPEN() {
 }
 
 GMOD_MODULE_CLOSE() {
-    delete rempos::gmsv::kRemPos;
-    rempos::gmsv::kRemPos = nullptr;
+    rempos::gmsv::rempos_server.reset(nullptr);
 
     return 0;
 }

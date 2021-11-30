@@ -10,17 +10,26 @@ namespace rempos {
 class RemPos {
 public:
     RemPos(uint16_t port)
-        : server_(new senzor_server::Server(GenerateCallback())),
-        worker_(new std::thread(&RemPos::RunServerByPort, this, port)) {}
+        : server_(GenerateCallback()),
+        worker_(&RemPos::RunServerByPort, this, port) {}
 
     RemPos(std::string ip, std::string port)
-        : server_(new senzor_server::Server(GenerateCallback())),
-        worker_(new std::thread(&RemPos::RunServerByIPAndPort, this, std::move(ip), std::move(port))) {}
+        : server_(GenerateCallback()),
+        worker_(&RemPos::RunServerByIPAndPort, this, std::move(ip), std::move(port)) {}
+
+    RemPos(RemPos&) = delete;
+
+    RemPos(RemPos&&) = delete;
 
     ~RemPos() {
-        server_->Stop();
-        worker_->join();
+        server_.Stop();
+        worker_.join();
     }
+
+public:
+    RemPos& operator=(RemPos&) = delete;
+
+    RemPos& operator=(RemPos&&) = delete;
 
 public:
     // Gets last data packet. I'm not sure if we should collect all packets in a queue to be read.
@@ -38,11 +47,11 @@ private:
     }
 
     void RunServerByPort(uint16_t port) {
-        server_->Run(port);
+        server_.Run(port);
     }
 
     void RunServerByIPAndPort(std::string ip, std::string port) {
-        server_->Run(ip, port);
+        server_.Run(ip, port);
     }
 
     inline void UpdateData(senzor_server::SenzorResult&& data) {
@@ -53,8 +62,8 @@ private:
 private:
     senzor_server::SenzorResult last_data_;
     mutable std::mutex guard_;
-    std::unique_ptr<senzor_server::Server> server_;
-    std::unique_ptr<std::thread> worker_;
+    senzor_server::Server server_;
+    std::thread worker_;
 };
 
 } // namespace rempos

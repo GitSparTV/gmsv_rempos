@@ -1,43 +1,46 @@
+#include <nlohmann/json.hpp>
+
 #include "senzor_server.h"
-#include "json.h"
 
 namespace rempos {
 
 namespace senzor_server {
 
-namespace util {
+using json = nlohmann::json;
 
-[[nodiscard]] inline SenzorResult ReadSenzorData(json::Dictionary map) {
-    auto& accelerStruct = map.at("accelerStruct").AsMap();
-    auto& gpsStruct = map.at("gpsStruct").AsMap();
-    auto& gyroStruct = map.at("gyroStruct").AsMap();
-    auto& pressStruct = map.at("pressStruct").AsMap();
-    auto& timestruct = map.at("timestruct").AsMap();
-    auto& userAccelerStruct = map.at("userAccelerStruct").AsMap();
+namespace json_util {
+
+[[nodiscard]] inline SenzorResult ReadSenzorData(const json& input) {
+    const auto& accelerStruct = input["accelerStruct"];
+    const auto& gpsStruct = input["gpsStruct"];
+    const auto& gyroStruct = input["gyroStruct"];
+    const auto& pressStruct = input["pressStruct"];
+    const auto& timestruct = input["timestruct"];
+    const auto& userAccelerStruct = input["userAccelerStruct"];
 
     return {
-        .acceleration = {
-            static_cast<float>(accelerStruct.at("x").AsDouble()),
-            static_cast<float>(accelerStruct.at("y").AsDouble()),
-            static_cast<float>(accelerStruct.at("z").AsDouble())
-    },
-        .user_acceleration = {
-            static_cast<float>(userAccelerStruct.at("ux").AsDouble()),
-            static_cast<float>(userAccelerStruct.at("uy").AsDouble()),
-            static_cast<float>(userAccelerStruct.at("uz").AsDouble())
-    },
+        {
+            accelerStruct["x"].get<float>(),
+            accelerStruct["y"].get<float>(),
+            accelerStruct["z"].get<float>()
+        },
+        {
+            userAccelerStruct["ux"].get<float>(),
+            userAccelerStruct["uy"].get<float>(),
+            userAccelerStruct["uz"].get<float>()
+        },
         // Adapt for Source Engine
-        .gyroscope = {
-            static_cast<float>(-gyroStruct.at("pitch").AsDouble()),
-            static_cast<float>(gyroStruct.at("yaw").AsDouble()),
-            static_cast<float>(gyroStruct.at("roll").AsDouble())
-    },
-        .gps = {
-            gpsStruct.at("latitude").AsDouble(),
-            gpsStruct.at("longitude").AsDouble()
-    },
-        .pressure = pressStruct.at("pressure").AsDouble(),
-        .timecode = timestruct.at("timeMark").AsDouble()
+        {
+            -gyroStruct["pitch"].get<float>(),
+            gyroStruct["yaw"].get<float>(),
+            gyroStruct["roll"].get<float>()
+        },
+        {
+            gpsStruct["latitude"].get<double>(),
+            gpsStruct["longitude"].get<double>()
+        },
+        pressStruct["pressure"].get<double>(),
+        timestruct["timeMark"].get<double>()
     };
 }
 
@@ -68,13 +71,11 @@ void Server::OnOpen(websocketpp::connection_hdl hdl) {
 }
 
 void Server::OnMessage(websocketpp::connection_hdl hdl, WebSocketServer::message_ptr msg) {
-    // We will use streams for now
     {
-        std::istringstream payload_stream(msg->get_payload());
-        json::Dictionary data_json = json::Load(payload_stream).GetRoot().AsMap();
-
+        json payload_json = json::parse(msg->get_payload());
+        
         assert(callback_);
-        callback_(std::move(util::ReadSenzorData(data_json)));
+        callback_(std::move(json_util::ReadSenzorData(payload_json)));
     }
 
     // Acknowledgement

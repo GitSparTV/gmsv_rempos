@@ -19,12 +19,12 @@ Check [releases page](https://github.com/GitSparTV/gmsv_rempos/releases) for pre
 Put `.dll` into garrysmod/lua/bin/ folder.
 
 ## Building
-Requirements: CMake, C++20, Websocketpp headers, Standalone ASIO or Boost.ASIO, gmod-module-base.
+Requirements: CMake, C++17, [Websocketpp](https://github.com/zaphoyd/websocketpp), [Standalone ASIO](https://think-async.com/Asio/AsioStandalone.html) or Boost.ASIO, [nlohmann's JSON](https://github.com/nlohmann/json), [gmod-module-base]().
 
 ```sh
 mkdir build
 cd build
-cmake ../ -DGMOD_MODULE_BASE="<path_to_gmod_module_base_root>" -DWEBSOCKETPP="<path_to_websockepp_root>" -DASIO="<path_to_asio>" -A Win32
+cmake ../ -DGMOD_MODULE_BASE="<path_to_gmod_module_base_root>" -DWEBSOCKETPP="<path_to_websockepp_root>" -DASIO="<path_to_asio>" -DNLOHMANN_JSON="<path_to_nlohmann_json_root>" -DCMAKE_BUILD_TYPE=Release -A Win32
 cmake --build . --config=Release --verbose
 ```
 
@@ -43,17 +43,17 @@ Quick note: gmod-module-base requires small patch in the SourceCompat.h:
 
 ## Documentation
 
-First of all call `require("rempos")`, this will popular `RemPos` global table.
+First of all call `require("rempos")`, this will populate `RemPos` global table.
 
 ### `boolean = RemPos.Initialize()`
-Initializes websocket server on localhost with default port defined in gmsv_rempos.cpp (8080).
+Initializes websocket server on `0.0.0.0` with default port defined in gmsv_rempos.cpp (8080).
 
 Must be called before using other functions.
 
 Returns true on success, otherwise raises error.
 
 ### `boolean = RemPos.Initialize(number port)`
-Initializes websocket server on localhost with specified `port`.
+Initializes websocket server on `0.0.0.0` with specified `port`.
 
 Must be called before using other functions.
 
