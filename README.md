@@ -7,12 +7,6 @@ Built with [websocketpp](https://github.com/zaphoyd/websocketpp) library.
 
 https://user-images.githubusercontent.com/5685050/143723137-593afe00-7c64-4690-87ab-0fe94f25c7de.mp4
 
----
-
-__[<img src="https://raw.githubusercontent.com/GitSparTV/GitSparTV/main/saythanks.svg" width="300">](https://gitspartv.github.io/GitSparTV/saythanks.html)__
-
----
-
 ## Using
 Check [releases page](https://github.com/GitSparTV/gmsv_rempos/releases) for pre-built binaries.
 
